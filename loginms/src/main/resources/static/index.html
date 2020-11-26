@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring Boot App ID Sample</title>
+    <link type="text/css" href="css/style.css" rel="stylesheet" />
+    <script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/webjars/js-cookie/js.cookie.js"></script>
+    <script type="text/javascript">
+        $.ajaxSetup({
+                beforeSend : function(xhr, settings) {
+                    if (settings.type == 'POST' || settings.type == 'PUT'
+                        || settings.type == 'DELETE') {
+                        if (!(/^http:.*/.test(settings.url) || /^https:.*/
+                            .test(settings.url))) {
+                            // Only send the token to relative URLs i.e. locally.
+                            xhr.setRequestHeader("X-XSRF-TOKEN",
+                                Cookies.get('XSRF-TOKEN'));
+                        }
+                    }
+                }
+            });
+        $.get("/user", function(data) {
+            $("#user").html(data.userAuthentication.details.name);
+            $("#userSub").html(data.userAuthentication.details.sub);
+            $("#userEmail").html(data.userAuthentication.details.email);
+            $("#provider").html(data.userAuthentication.details.identities[0].provider);
+            $(".unauthenticated").hide()
+            $(".authenticated").show()
+        }).fail(function() {
+            $(".unauthenticated").show()
+            $(".authenticated").hide()
+        });
+ 
+        <!-- In this case, we will call GET /userInfo, and this will give us back a string with userinfo details from Principal user -->
+        $.get("/userInfo", function(data) {
+            $("#userInfoString").html(data);
+            $(".unauthenticated").hide()
+            $(".authenticated").show()
+        }).fail(function() {
+            $(".unauthenticated").show()
+            $(".authenticated").hide()
+        });
+ 
+        <!-- In this case, we will call GET /userInfo, and this will give us back a string with userinfo details from Principal user -->
+        $.get("/userToken", function(data) {
+            $("#userToken").html(data);
+            $(".unauthenticated").hide()
+            $(".authenticated").show()
+        }).fail(function() {
+            $(".unauthenticated").show()
+            $(".authenticated").hide()
+        });
+        
+        var logout = function() {
+            $.post("/logout", function() {
+                $("#user").html('');
+                $(".unauthenticated").show();
+                $(".authenticated").hide();
+            })
+            return true;
+        }
+    </script>
+ 
+</head>
+<div class="container unauthenticated" style="text-align: center;">
+    <a href="/login">Login</a>
+</div>
+<div class="container authenticated" style="text-align: center;" >
+    <strong>Logged in as: <span id="user"></span></strong>
+    <br>
+    <br>
+    <strong>Sub: </strong><span id="userSub"></span>
+    <br>
+    <strong>Email: </strong><span id="userEmail"></span>
+    <br>
+    <strong>Provider: </strong><span id="provider"></span>
+    <br>
+    <br>
+    <strong>User Profile Information: </strong>
+    <br>
+    <span id="userInfoString"></span>
+    <br>
+      <strong>User Token: </strong>
+    <br>
+    <span id="userToken"></span>
+    <br>
+    <br>
+    
+       <br>
+      <strong>Transaction Token: </strong>
+    <br>
+    <span id="txnToken"></span>
+    <br>
+    <button onClick="logout()">Logout</button>
+    </div>
+    
+     <div class="container authenticated" style="text-align: left;" >
+    <strong>Please find below the list of available products and select the product you want to order:</strong>
+    <table id="table" border="1">
+  <tr>
+    <th>Product Id</th>
+    <th>Product Name</th>
+    <th>Product Price</th>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Dell Laptop</td>
+    <td>$5000</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>HP Laptop</td>
+    <td>$4000</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Lenovo Laptop</td>
+    <td>$3000</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Acer Laptop</td>
+    <td>$2500</td>
+  </tr>
+  </table>
+  <br>
+        <br><b><font color="green" >
+        Product Order Details:</font></b><br>
+        
+        Product Name:<input type="text" name="productName" id="productName">        Quantity:<input type="text" name="productQty" id="productQty"><br><br>
+<input type="button" id="tst" value="Submit Order" onclick="getTxnToken();submitProductOrder();" />
+<br>
+<br>
+<span id="results"></span>
+ <script>
+ function submitProductOrder(){
+	
+	if(document.getElementById('productName').value == null || document.getElementById('productName').value == '')
+		alert('Please select the Product');
+	if(document.getElementById('productQty').value == null || document.getElementById('productQty').value == '')
+		alert('Please enter the quantity');
+	var productName = document.getElementById('productName').value;
+	var productQty = document.getElementById('productQty').value;
+	var userToken = document.getElementById('userToken').innerHTML;
+	var txnToken = document.getElementById('txnToken').innerHTML;
+	var url = "http://localhost:8085/order-microservice/add/"+productName+"/"+
+	productQty+"/"+userToken+"/"+txnToken;
+	
+	console.log("Order Url ==> " + url);
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function() {
+	    if (this.readyState == 4 && this.status == 200) {
+	       // Typical action to be performed when the document is ready:
+	        var response = xhttp.responseText;
+	    	alert("response " + response)
+	        console.log("results "+response);
+	        document.getElementById("results").innerHTML = response;
+	        document.getElementById('productName').value='';
+	        document.getElementById('productQty').value='';
+	    }
+	};
+	
+	xhttp.open("POST", url, true);
+
+	xhttp.send();
+}
+ 
+ function getTxnToken(){
+	
+		 $.get("/getTxnToken", function(data) {
+	            $("#txnToken").html(data);
+	        });
+	       
+ }
+ </script>
+ <br>
+</div>
+</body>
+</html>

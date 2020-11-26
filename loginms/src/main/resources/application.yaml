@@ -1,0 +1,9 @@
+security:
+  oauth2:
+    client:
+      clientId: be88edb7-e7fc-403b-83b3-c1d016a48548
+      clientSecret: MTE0MTNmOGUtM2Q1Yi00ZWMyLWJmN2UtM2Q5MWFjNWFkNThl
+      accessTokenUri: https://us-south.appid.cloud.ibm.com/oauth/v4/8b6707ef-236a-4e9e-bde3-ced1034f9e1d/token
+      userAuthorizationUri: https://us-south.appid.cloud.ibm.com/oauth/v4/8b6707ef-236a-4e9e-bde3-ced1034f9e1d/authorization
+    resource:
+      userInfoUri: https://us-south.appid.cloud.ibm.com/oauth/v4/8b6707ef-236a-4e9e-bde3-ced1034f9e1d/userinfo
