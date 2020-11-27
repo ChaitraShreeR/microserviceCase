@@ -11,7 +11,7 @@ import com.ibm.ordermicroservice.repository.OrderAuditRepository;
 import com.ibm.ordermicroservice.repository.OrderRepository;
 
 @Service
-public class OrderServiceImpl {
+public class OrderServiceImpl implements OrderServices{
 
 	@Autowired
 	OrderRepository orderRepository;

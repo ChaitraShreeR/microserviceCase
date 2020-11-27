@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: order-microservice
+      datasource:    url: jdbc:h2:mem:casedb
+    driver-class-name: org.h2.Driver
+    username: ibm
+    password: ibm  h2:    console:      enabled: true
+        jpa:    show-sql: true
+    
+server:  port: 8085
